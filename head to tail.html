@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+body {
+    background-color: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+}
+
+.app-container {
+    text-align: center;
+}
+
+/* 3D Coin Setup */
+.coin {
+    width: 150px;
+    height: 150px;
+    margin: 20px auto;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1s ease-in-out;
+}
+
+.side {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    font-weight: bold;
+    backface-visibility: hidden;
+    border: 5px solid #ffd700;
+}
+
+.heads {
+    background-color: #ffcc00;
+    color: #444;
+}
+
+.tails {
+    background-color: #e6b800;
+    color: #444;
+    transform: rotateY(180deg);
+}
+
+/* Button Styling */
+button {
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    background-color: #ffd700;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+/* Result Text Animation */
+#resultText {
+    margin: 20px 0;
+    min-height: 1.5em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+    </style>
+</head>
+<body>
+   <div class="app-container">
+        <h1>Coin Toss</h1>
+        
+        <div id="coin" class="coin">
+            <div class="side heads">H</div>
+            <div class="side tails">T</div>
+        </div>
+
+        <h2 id="resultText">Click to Flip!</h2>
+        
+        <button id="flipBtn">Flip Coin</button>
+    </div>
+
+    <script src="script.js"></script> 
+</body>
+<script>
+    const coin = document.getElementById('coin');
+const flipBtn = document.getElementById('flipBtn');
+const resultText = document.getElementById('resultText');
+
+flipBtn.addEventListener('click', () => {
+    // 1. Generate a random result (0 or 1)
+    const isHeads = Math.random() < 0.5;
+    
+    // 2. Add a temporary "flipping" state
+    flipBtn.disabled = true;
+    resultText.innerText = "Flipping...";
+
+    // 3. Calculate rotation
+    // We add extra rotations (1800 deg) to make it look like it's spinning fast
+    const randomRotation = isHeads ? 0 : 180;
+    const totalRotation = 1800 + randomRotation; 
+
+    // 4. Apply the animation
+    coin.style.transform = `rotateY(${totalRotation}deg)`;
+
+    // 5. Wait for the animation to finish (1 second)
+    setTimeout(() => {
+        const finalResult = isHeads ? "HEAD" : "TAIL";
+        resultText.innerText = finalResult;
+        
+        // Reset the rotation so it can flip again from current position
+        // without the "snapping" glitch
+        if (!isHeads) {
+            coin.style.transition = "none";
+            coin.style.transform = "rotateY(180deg)";
+        } else {
+            coin.style.transition = "none";
+            coin.style.transform = "rotateY(0deg)";
+        }
+        
+        // Force a re-flow to re-enable transitions for the next click
+        coin.offsetHeight; 
+        coin.style.transition = "transform 1s ease-in-out";
+        
+        flipBtn.disabled = false;
+    }, 1000);
+});
+</script>
+</html>
